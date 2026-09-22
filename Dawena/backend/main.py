@@ -426,20 +426,24 @@ def diag(url: str = ""):
     out = {"ytdlp_version": getattr(_ydl.version, "__version__", "?"),
            "cookies_env": bool(os.getenv("YTDLP_COOKIES", "").strip())}
     if url and _is_valid_url(url):
-        try:
-            opts = {"quiet": True, "no_warnings": True, "noplaylist": True, "skip_download": True,
-                    "socket_timeout": 25,
-                    "extractor_args": {"youtube": {"player_client": ["android", "web"]}}}
-            ck = _cookie_file()
-            out["cookie_file"] = bool(ck)
-            if ck:
-                opts["cookiefile"] = ck
-            with _ydl.YoutubeDL(opts) as ydl:
-                info = ydl.extract_info(url, download=False)
-                out["title"] = (info or {}).get("title")
-                out["formats"] = len((info or {}).get("formats") or [])
-        except Exception as e:
-            out["error"] = str(e)[:400]
+        ck = _cookie_file()
+        out["cookie_file"] = bool(ck)
+        out["clients"] = {}
+        for client in (None, ["web"], ["android"], ["ios"], ["tv"], ["web_creator"]):
+            name = "default" if client is None else "+".join(client)
+            try:
+                opts = {"quiet": True, "no_warnings": True, "noplaylist": True, "skip_download": True,
+                        "socket_timeout": 25}
+                if client:
+                    opts["extractor_args"] = {"youtube": {"player_client": client}}
+                if ck:
+                    opts["cookiefile"] = ck
+                with _ydl.YoutubeDL(opts) as ydl:
+                    info = ydl.extract_info(url, download=False)
+                    out["clients"][name] = {"title": (info or {}).get("title"),
+                                            "formats": len((info or {}).get("formats") or [])}
+            except Exception as e:
+                out["clients"][name] = {"error": str(e)[:200]}
     return JSONResponse(out)
 
 
