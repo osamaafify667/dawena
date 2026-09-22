@@ -332,7 +332,7 @@ def scrape_generic_site(url: str) -> dict:
         msg = str(e)
         # روابط google/sorry الطويلة بتخوف المستخدم، اختصرها لرسالة مفهومة
         if "429" in msg or "sorry" in msg or "Too Many Requests" in msg:
-            raise HTTPException(status_code=429, detail="يوتيوب حظر الطلب مؤقتا من سيرفر الاستضافة المجانية (حماية ضد السيرفرات). جرب: 1) رابط تيك توك أو انستا 2) استنى 10 دقايق وجرب تاني 3) جرب فيديو آخر")
+            raise HTTPException(status_code=429, detail="يوتيوب حظر الطلب مؤقتا من سيرفر الاستضافة (حماية ضد السيرفرات). جرب: 1) رابط تيك توك أو انستا 2) استنى 10 دقايق وجرب تاني 3) جرب فيديو آخر")
         raise HTTPException(status_code=400, detail=f"تعذر فتح الرابط: {msg[:150]}")
 
     soup = BeautifulSoup(r.text, "lxml")
