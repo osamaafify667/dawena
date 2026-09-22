@@ -29,6 +29,17 @@
 #dawena-app .frow a{color:#38bdf8}
 #dawena-app .note{color:#94a3b8;font-size:12px;margin-top:14px;text-align:center;line-height:1.9}
 #dawena-app .sec{color:#38bdf8;text-decoration:none}
+@media (max-width:640px){
+#dawena-app{padding:14px;margin:10px auto;border-radius:12px}
+#dawena-app h1{font-size:20px}
+#dawena-app .sub{font-size:13px}
+#dawena-app .box{flex-direction:column}
+#dawena-app input{font-size:16px;width:100%}
+#dawena-app button,.dbtn{width:100%;text-align:center}
+#dawena-app select{width:100%}
+#dawena-app .grid{grid-template-columns:repeat(2,1fr)}
+#dawena-app .frow{flex-direction:column;align-items:flex-start}
+}
 </style>
 
 <h1>🚀 <span>Dawena</span> downloader</h1>
@@ -44,6 +55,16 @@
 <div id="d-result"></div>
 
 <p class="note">⚠️ حمّل فقط المحتوى المسموح به.<br/><b style="color:#f1f5f9;font-size:15px">🛡️ الموقع بيفحص كل المحتوى من أي فيروسات أو برامج ضارة علشان يحافظ على جهازك</b></p>
+
+<div id="d-yttoast" style="display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#450a0a;border:1px solid #ef4444;color:#fecaca;padding:12px 18px;border-radius:12px;font-size:14px;z-index:9999;max-width:90%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.5)">⚠️ تنبيه: التحميل من يوتيوب متعطل حاليا بسبب حظر يوتيوب على الاستضافة — باقي المنصات (تيك توك / فيسبوك / انستا) شغالة ✅</div>
+<script>
+setInterval(function(){
+  var t = document.getElementById('d-yttoast');
+  if(!t) return;
+  t.style.display = 'block';
+  setTimeout(function(){ t.style.display = 'none'; }, 4000);
+}, 10000);
+</script>
 
 <script>
 var DAWENA_API = "https://dawena.onrender.com";
