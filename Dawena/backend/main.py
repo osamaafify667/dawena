@@ -16,7 +16,7 @@ import requests
 from urllib.parse import urljoin, urlparse
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
+from fastapi.responses import RedirectResponse, FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from bs4 import BeautifulSoup
 
@@ -412,6 +412,47 @@ def scrape_generic_site(url: str) -> dict:
         "images": images,
         "files": files,
     }
+
+
+ALLOWED_FETCH_HOSTS = (
+    "tiktokcdn.com", "tiktokcdn-us.com", "tiktokcdn-eu.com",
+    "googlevideo.com", "youtube.com", "youtu.be", "googleusercontent.com",
+    "fbcdn.net", "fbsbx.com", "cdninstagram.com",
+    "pbs.twimg.com", "video.twimg.com", "twimg.com",
+    "vk.com", "vkuseraudio.net",
+)
+
+
+@app.get("/api/fetch")
+def api_fetch(url: str = Query(...), name: str = Query(default="dawena-file")):
+    """تحميل مباشر: السيرفر يسحب الملف ويرجعه بأمر تنزيل إجباري (يشتغل على الموبايل بدل فتح الفيديو)."""
+    if not _is_valid_url(url):
+        raise HTTPException(status_code=400, detail="الرابط غير صالح")
+    host = (urlparse(url).hostname or "").lower()
+    if not any(host == h or host.endswith("." + h) for h in ALLOWED_FETCH_HOSTS):
+        return RedirectResponse(url)
+    try:
+        upstream = requests.get(url, stream=True, timeout=60,
+                                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        if upstream.status_code != 200:
+            raise HTTPException(status_code=400, detail="تعذر جلب الملف من المصدر")
+        media = (upstream.headers.get("content-type") or "application/octet-stream").split(";")[0].strip()
+        safe = re.sub(r"[^a-zA-Z0-9_.\-]", "_", name)[:80] or "dawena-file"
+
+        def gen():
+            try:
+                for chunk in upstream.iter_content(64 * 1024):
+                    if chunk:
+                        yield chunk
+            finally:
+                upstream.close()
+
+        return StreamingResponse(gen(), media_type=media,
+                                 headers={"Content-Disposition": f'attachment; filename="{safe}"'})
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"تعذر تحميل الملف: {str(e)[:120]}")
 
 
 @app.get("/")
