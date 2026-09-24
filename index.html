@@ -193,9 +193,12 @@ function dawenaRender(d){
     if(!q||!dl) return;
     if(DAWENA_DATA && DAWENA_DATA.source && DAWENA_DATA.source!=='ytdlp'){
       var v=(DAWENA_DATA.videos||[]).find(function(x){return x.format_id===q.value;});
-      dl.href = v ? v.direct_url : '#';
+      // يعدي على السيرفر بأمر تنزيل إجباري عشان الموبايل ينزل بدل ما يفتح الفيديو
+      dl.href = v ? (DAWENA_API + '/api/fetch?url=' + encodeURIComponent(v.direct_url) + '&name=dawena-video.mp4') : '#';
+      dl.removeAttribute('target');
     } else {
       dl.href = DAWENA_API + '/api/download?url=' + encodeURIComponent(DAWENA_URL) + '&format_id=' + encodeURIComponent(q.value);
+      dl.target = '_blank';
     }
   }
   if(q){ q.onchange = upd; upd(); }
@@ -205,7 +208,7 @@ async function dawenaMp3(btn){
   dawenaShowAd();
   // لو السيرفر جاب رابط صوت مباشر (تيك توك) حمّله على طول من غير تحويل
   if (DAWENA_DATA && DAWENA_DATA.audios && DAWENA_DATA.audios[0] && DAWENA_DATA.audios[0].direct_url) {
-    var a0 = document.createElement('a'); a0.href = DAWENA_DATA.audios[0].direct_url; a0.download = 'dawena-audio.mp3'; a0.target = '_blank'; a0.click();
+    var a0 = document.createElement('a'); a0.href = DAWENA_API + '/api/fetch?url=' + encodeURIComponent(DAWENA_DATA.audios[0].direct_url) + '&name=dawena-audio.mp3'; a0.click();
     return;
   }
   btn.disabled = true; var old = btn.innerText; btn.innerText = 'جاري التحويل...'; dErr('');

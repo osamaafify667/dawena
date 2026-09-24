@@ -1,4 +1,10 @@
-<div id="dawena-app" dir="rtl" style="font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0f172a;color:#f1f5f9;border-radius:16px;padding:20px;max-width:900px;margin:0 auto;min-height:80vh">
+<script>(function(s){s.dataset.zone='11862997',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+<script src="https://5gvci.com/act/files/tag.min.js?z=11862998" data-cfasync="false" async></script>
+<div class="d-layout" dir="rtl" style="display:flex;gap:16px;justify-content:center;align-items:flex-start;max-width:1400px;margin:0 auto;padding:0 10px">
+<div class="d-side" id="ad-right" style="width:300px;flex-shrink:0;position:sticky;top:16px;min-height:250px">
+<!-- الصق كود إعلان اليمين (بانر 300×250 أو 300×600) هنا -->
+</div>
+<div id="dawena-app" dir="rtl" style="flex:1;font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0f172a;color:#f1f5f9;border-radius:16px;padding:20px;max-width:900px;margin:0 auto;min-height:80vh">
 <style>
 body{background:#0b1120 !important}
 #dawena-app *{box-sizing:border-box}
@@ -49,6 +55,11 @@ body{background:#0b1120 !important}
 
 <p class="note">⚠️ حمّل فقط المحتوى المسموح به.<br/><b style="color:#f1f5f9;font-size:15px">🛡️ الموقع بيفحص كل المحتوى من أي فيروسات أو برامج ضارة علشان يحافظ على جهازك</b><br/>مدعوم من <a class="sec" href="https://github.com" target="_blank">Dawena</a></p>
 
+<div style="margin-top:22px;line-height:2;color:#cbd5e1;font-size:14px;text-align:right">
+<h2 style="font-size:18px;color:#f1f5f9">تحميل الفيديو من جميع المنصات بجودة عالية</h2>
+<p>موقع Dawena أداة مجانية لـ <strong>تحميل الفيديو</strong>: <strong>تحميل الفيديو من يوتيوب</strong>، <strong>تحميل الفيديو من تيك توك</strong> بدون علامة مائية، <strong>تحميل الفيديو من فيسبوك</strong>، <strong>تحميل الفيديو من انستجرام</strong>، و<strong>تحميل الفيديو من تويتر</strong> — بالإضافة إلى <strong>تحويل الفيديو لصوت MP3</strong> وتحميل الصور والملفات مع فحص الفيروسات.</p>
+</div>
+
 <div id="d-yttoast" style="display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#450a0a;border:1px solid #ef4444;color:#fecaca;padding:12px 18px;border-radius:12px;font-size:14px;z-index:9999;max-width:90%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.5)">⚠️ تنبيه: التحميل من يوتيوب متعطل حاليا بسبب حظر يوتيوب على الاستضافة — باقي المنصات (تيك توك / فيسبوك / انستا) شغالة ✅</div>
 <script>
 //<![CDATA[
@@ -66,6 +77,17 @@ setInterval(function(){
 var DAWENA_API = "https://dawena.onrender.com";
 var DAWENA_DATA = null;
 var DAWENA_URL = "";
+var DAWENA_LAST_AD = 0;
+function dawenaShowAd(){
+  try{
+    if(Date.now() - DAWENA_LAST_AD < 60000) return;
+    DAWENA_LAST_AD = Date.now();
+    var s = document.createElement('script');
+    s.dataset.zone = '11862973';
+    s.src = 'https://n6wxm.com/vignette.min.js';
+    (document.body || document.documentElement).appendChild(s);
+  }catch(e){}
+}
 
 function dErr(m){document.getElementById('d-err').innerHTML = m ? '<div class="err">'+m+'</div>' : '';}
 
@@ -74,6 +96,7 @@ async function dawenaFetch(){
   dErr(''); document.getElementById('d-result').innerHTML=''; document.getElementById('d-scan').innerHTML='';
   if(!url.startsWith('http')){ dErr('الصق رابط صحيح يبدأ بـ http'); return; }
   DAWENA_URL = url;
+  dawenaShowAd();
   var btn = document.getElementById('d-go'); btn.disabled = true; btn.innerText = 'جاري التحليل...';
   try{
     var r = await fetch(DAWENA_API + '/api/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url})});
@@ -104,7 +127,7 @@ function dawenaRender(d){
   if(d.videos && d.videos.length){
     h += '<h3>🎬 الفيديو — اختار الجودة</h3><div class="row"><select id="d-q"><option value="best">أعلى جودة تلقائية</option>';
     d.videos.forEach(function(v,i){ h += '<option value="'+v.format_id+'">'+escapeHtml(v.quality)+' • '+escapeHtml(v.ext)+'</option>'; });
-    h += '</select> <a class="dbtn" id="d-dl" href="#" target="_blank">⬇️ تحميل فيديو MP4</a> ';
+    h += '</select> <a class="dbtn" id="d-dl" href="#" target="_blank" onclick="dawenaShowAd()">⬇️ تحميل فيديو MP4</a> ';
     h += '<button onclick="dawenaMp3(this)">🎵 تحميل صوت MP3 فقط</button></div>';
   }
   h += '</div>';
@@ -130,17 +153,20 @@ function dawenaRender(d){
     if(!q||!dl) return;
     if(DAWENA_DATA && DAWENA_DATA.source && DAWENA_DATA.source!=='ytdlp'){
       var v=(DAWENA_DATA.videos||[]).find(function(x){return x.format_id===q.value;});
-      dl.href = v ? v.direct_url : '#';
+      dl.href = v ? (DAWENA_API + '/api/fetch?url=' + encodeURIComponent(v.direct_url) + '&name=dawena-video.mp4') : '#';
+      dl.removeAttribute('target');
     } else {
       dl.href = DAWENA_API + '/api/download?url=' + encodeURIComponent(DAWENA_URL) + '&format_id=' + encodeURIComponent(q.value);
+      dl.target = '_blank';
     }
   }
   if(q){ q.onchange = upd; upd(); }
 }
 
 async function dawenaMp3(btn){
+  dawenaShowAd();
   if (DAWENA_DATA && DAWENA_DATA.audios && DAWENA_DATA.audios[0] && DAWENA_DATA.audios[0].direct_url) {
-    var a0 = document.createElement('a'); a0.href = DAWENA_DATA.audios[0].direct_url; a0.download = 'dawena-audio.mp3'; a0.target = '_blank'; a0.click();
+    var a0 = document.createElement('a'); a0.href = DAWENA_API + '/api/fetch?url=' + encodeURIComponent(DAWENA_DATA.audios[0].direct_url) + '&name=dawena-audio.mp3'; a0.click();
     return;
   }
   btn.disabled = true; var old = btn.innerText; btn.innerText = 'جاري التحويل...'; dErr('');
@@ -156,3 +182,8 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g,function(c){return {
 //]]>
 </script>
 </div>
+<div class="d-side" id="ad-left" style="width:300px;flex-shrink:0;position:sticky;top:16px;min-height:250px">
+<!-- الصق كود إعلان الشمال (بانر 300×250 أو 300×600) هنا -->
+</div>
+</div>
+<style>@media (max-width:1250px){.d-side{display:none !important}}</style>
