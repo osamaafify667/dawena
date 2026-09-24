@@ -167,7 +167,7 @@ function dawenaRender(d){
   if(d.videos && d.videos.length){
     h += '<h3>🎬 الفيديو — اختار الجودة</h3><div class="row"><select id="d-q"><option value="best">أعلى جودة تلقائية</option>';
     d.videos.forEach(function(v,i){ h += '<option value="'+v.format_id+'">'+escapeHtml(v.quality)+' • '+escapeHtml(v.ext)+'</option>'; });
-    h += '</select> <a class="dbtn" id="d-dl" href="#" target="_blank" onclick="dawenaShowAd()">⬇️ تحميل فيديو MP4</a> ';
+    h += '</select> <button class="dbtn" id="d-dl">⬇️ تحميل فيديو MP4</button> ';
     h += '<button onclick="dawenaMp3(this)">🎵 تحميل صوت MP3 فقط</button></div>';
   }
   h += '</div>';
@@ -189,19 +189,23 @@ function dawenaRender(d){
   document.getElementById('d-result').innerHTML = h;
   var q = document.getElementById('d-q');
   var dl = document.getElementById('d-dl');
-  function upd(){
-    if(!q||!dl) return;
+  function dawenaDlLink(){
+    if(!q) return '#';
     if(DAWENA_DATA && DAWENA_DATA.source && DAWENA_DATA.source!=='ytdlp'){
       var v=(DAWENA_DATA.videos||[]).find(function(x){return x.format_id===q.value;});
       // يعدي على السيرفر بأمر تنزيل إجباري عشان الموبايل ينزل بدل ما يفتح الفيديو
-      dl.href = v ? (DAWENA_API + '/api/fetch?url=' + encodeURIComponent(v.direct_url) + '&name=dawena-video.mp4') : '#';
-      dl.removeAttribute('target');
-    } else {
-      dl.href = DAWENA_API + '/api/download?url=' + encodeURIComponent(DAWENA_URL) + '&format_id=' + encodeURIComponent(q.value);
-      dl.target = '_blank';
+      return v ? (DAWENA_API + '/api/fetch?url=' + encodeURIComponent(v.direct_url) + '&name=dawena-video.mp4') : '#';
     }
+    return DAWENA_API + '/api/download?url=' + encodeURIComponent(DAWENA_URL) + '&format_id=' + encodeURIComponent(q.value);
   }
-  if(q){ q.onchange = upd; upd(); }
+  if(q && dl){
+    dl.onclick = function(){
+      var link = dawenaDlLink();
+      if(link === '#'){ dErr('حلل الرابط من جديد واختار الجودة أولا'); return; }
+      dawenaShowAd();
+      window.location.href = link;
+    };
+  }
 }
 
 async function dawenaMp3(btn){
